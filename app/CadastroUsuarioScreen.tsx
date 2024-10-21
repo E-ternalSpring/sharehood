@@ -1,44 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { TextInput, TouchableOpacity, ActivityIndicator, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'expo-router';
 import * as Font from 'expo-font';
-import styles from '@/styles/LoginScreenStyles';
+import styles from '@/styles/CadastroUsuarioScreenStyles';
 
-const loginSchema = yup.object({
+const cadastroSchema = yup.object({
+  nome: yup.string().required('Nome completo é obrigatório'),
   cpf: yup.string().required('CPF é obrigatório').min(11, 'CPF deve ter 11 dígitos'),
+  email: yup.string().required('E-mail é obrigatório').email('E-mail inválido'),
   password: yup.string().required('Senha é obrigatória').min(6, 'Senha deve ter ao menos 6 caracteres'),
 });
 
-const LoginScreen = () => {
+const CadastroUsuarioScreen = () => {
   const router = useRouter();
   const { control, handleSubmit, formState: { errors } } = useForm({
-    resolver: yupResolver(loginSchema),
-  });
+  resolver: yupResolver(cadastroSchema),
+});
 
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+const onSubmit = async (data: any) => {
+  console.log(data);
+  // Aqui você pode adicionar a lógica para enviar os dados para o backend
+  // e navegar para a próxima tela, se necessário.
+  // router.push('/NextScreen'); // Altere para a tela que você deseja navegar após o cadastro
+};
+
+const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {
     const loadFonts = async () => {
       await Font.loadAsync({
         'JuliusSansOne': require('@/assets/fonts/JuliusSansOne-Regular.ttf'),
         'Jura': require('@/assets/fonts/Jura-VariableFont_wght.ttf'),
+        'Inter-VariableFont_opsz,wght': require('@/assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
+        'Inter-Italic-VariableFont_opsz,wght': require('@/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf'),
       });
       setFontsLoaded(true);
     };
 
     loadFonts();
   }, []);
-
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    // Aqui você pode adicionar a lógica para autenticar o usuário
-    // e navegar para a próxima tela após o login bem-sucedido
-    // router.push('/NextScreen'); // Altere para a tela que você deseja navegar após o login
-  };
 
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -56,6 +60,22 @@ const LoginScreen = () => {
         Conectando Vizinhos,{'\n'}
         Compartilhando Recursos
       </Text>
+      <Text style={styles.subtitle2}>Crie sua conta</Text>
+
+      <Controller
+        control={control}
+        name="nome"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            placeholder="Nome completo"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+          />
+        )}
+      />
+      {errors.nome && <Text style={styles.error}>{errors.nome.message}</Text>}
 
       <Controller
         control={control}
@@ -75,6 +95,22 @@ const LoginScreen = () => {
 
       <Controller
         control={control}
+        name="email"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextInput
+            style={styles.input}
+            placeholder="E-mail"
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            keyboardType="email-address"
+          />
+        )}
+      />
+      {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
+
+      <Controller
+        control={control}
         name="password"
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
@@ -90,14 +126,14 @@ const LoginScreen = () => {
       {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.buttonText}>ENTRAR</Text>
+        <Text style={styles.buttonText}>PRÓXIMO</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => router.push('./CadastroUsuarioScreen')}>
-        <Text style={styles.buttonText}>CADASTRAR</Text>
+      <TouchableOpacity onPress={() => router.push('/LoginScreen')}>
+        <Text style={styles.text}>Já tem uma conta?</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
 };
 
-export default LoginScreen;
+export default CadastroUsuarioScreen;

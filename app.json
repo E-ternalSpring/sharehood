@@ -27,10 +27,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "fonts": [
+      {
+        "family": "JuliusSansOne",
+        "uri": "./assets/fonts/JuliusSansOne-Regular.ttf"
+      }
+    ]
   }
 }

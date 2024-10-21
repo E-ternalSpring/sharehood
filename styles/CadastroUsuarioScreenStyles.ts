@@ -16,7 +16,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Jura',
     color: '#4B8562',
-    marginBottom: 60,
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  subtitle2: {
+    fontSize: 18,
+    fontFamily: 'Inter-VariableFont_opsz,wght',
+    color: '#4B8562',
+    marginBottom: 40,
     textAlign: 'center',
   },
   input: {
@@ -37,6 +44,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    marginTop: 20,
     marginBottom: 15,
     maxWidth: 300,
   },
@@ -44,6 +52,13 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  text: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    marginTop: 10,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
   error: {
     color: 'red',
