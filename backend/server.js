@@ -16,7 +16,27 @@ const db = new sqlite3.Database(':memory:', (err) => {
     console.error('Erro ao conectar ao banco de dados', err);
   } else {
     console.log('Conectado ao banco de dados SQLite.');
-    db.run(`CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, cpf TEXT, password TEXT)`);
+    db.run(`CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      cpf TEXT, 
+      password TEXT,
+      nome TEXT,
+      email TEXT
+    )`);
+
+    db.run(`CREATE TABLE enderecos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      userId INTEGER,
+      cep TEXT, 
+      estado TEXT, 
+      cidade TEXT, 
+      bairro TEXT, 
+      logradouro TEXT, 
+      numero TEXT, 
+      complemento TEXT,
+      nomeCondominio TEXT,
+      FOREIGN KEY (userId) REFERENCES users (id)
+    )`);
   }
 });
 
@@ -33,6 +53,31 @@ app.post('/login', (req, res) => {
     } else {
       res.status(401).json({ message: 'CPF ou senha inválidos' });
     }
+  });
+});
+
+// Rota de cadastro de usuário
+app.post('/cadastro-usuario', (req, res) => {
+  const { cpf, password, nome, email } = req.body;
+
+  db.run(`INSERT INTO users (cpf, password, nome, email) VALUES (?, ?, ?, ?)`, [cpf, password, nome, email], function(err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.status(201).json({ message: 'Usuário cadastrado com sucesso', userId: this.lastID });
+  });
+});
+
+// Rota de cadastro de endereço
+app.post('/cadastro-endereco', (req, res) => {
+  const { userId, cep, estado, cidade, bairro, logradouro, numero, complemento, nomeCondominio } = req.body;
+
+  db.run(`INSERT INTO enderecos (userId, cep, estado, cidade, bairro, logradouro, numero, complemento, nomeCondominio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+    [userId, cep, estado, cidade, bairro, logradouro, numero, complemento, nomeCondominio], function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: 'Endereço cadastrado com sucesso' });
   });
 });
 

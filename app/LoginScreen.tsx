@@ -20,6 +20,7 @@ const LoginScreen = () => {
   });
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadFonts = async () => {
@@ -33,16 +34,49 @@ const LoginScreen = () => {
     loadFonts();
   }, []);
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    // Aqui você pode adicionar a lógica para autenticar o usuário
-    // e navegar para a próxima tela após o login bem-sucedido
-    // router.push('/NextScreen'); // Altere para a tela que você deseja navegar após o login
-  };
-
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
+
+  const loginUser = async (cpf: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('https://sua-api.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cpf, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao autenticar');
+      }
+
+      const data = await response.json();
+      return data.success;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  //const onSubmit = async (data: any) => {
+    //console.log(data);
+    //const success = await loginUser(data.cpf, data.password);
+
+    //if (success) {
+    //  router.push('./HomeScreen');
+    //  setLoginError(null);
+    //} else {
+    //  setLoginError('Credenciais inválidas. Tente novamente.');
+    //}
+  //};
+
+  const onSubmit = async (data: any) => {
+    // Temporariamente ignora a autenticação e redireciona direto para a HomeScreen
+    router.push('./HomeScreen');
+    setLoginError(null);
+  };
 
   return (
     <LinearGradient

@@ -6,14 +6,28 @@ export default function RootLayout() {
       <Stack.Screen
         name="LoginScreen"
         options={{ 
-          title: 'Login',
+          title: 'LoginScreen',
           headerShown: false
         }} 
       />
       <Stack.Screen
         name="CadastroUsuarioScreen"
         options={{ 
-          title: 'Cadastro',
+          title: 'CadastroUsuarioScreen',
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen
+        name="CadastroEnderecoScreen"
+        options={{ 
+          title: 'CadastroEnderecoScreen',
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen
+        name="HomeScreen"
+        options={{ 
+          title: 'HomeScreen',
           headerShown: false
         }} 
       />

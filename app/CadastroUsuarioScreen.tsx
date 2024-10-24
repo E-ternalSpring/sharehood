@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { TextInput, TouchableOpacity, ActivityIndicator, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'expo-router';
-import * as Font from 'expo-font';
+import { useFonts } from 'expo-font';
 import styles from '@/styles/CadastroUsuarioScreenStyles';
 
 const cadastroSchema = yup.object({
@@ -18,31 +18,39 @@ const cadastroSchema = yup.object({
 const CadastroUsuarioScreen = () => {
   const router = useRouter();
   const { control, handleSubmit, formState: { errors } } = useForm({
-  resolver: yupResolver(cadastroSchema),
-});
+    resolver: yupResolver(cadastroSchema),
+  });
 
-const onSubmit = async (data: any) => {
-  console.log(data);
-  // Aqui você pode adicionar a lógica para enviar os dados para o backend
-  // e navegar para a próxima tela, se necessário.
-  // router.push('/NextScreen'); // Altere para a tela que você deseja navegar após o cadastro
-};
-
-const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    const loadFonts = async () => {
-      await Font.loadAsync({
-        'JuliusSansOne': require('@/assets/fonts/JuliusSansOne-Regular.ttf'),
-        'Jura': require('@/assets/fonts/Jura-VariableFont_wght.ttf'),
-        'Inter-VariableFont_opsz,wght': require('@/assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
-        'Inter-Italic-VariableFont_opsz,wght': require('@/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf'),
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetch('http://<SeuServidor>/cadastro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       });
-      setFontsLoaded(true);
-    };
+  
+      const result = await response.json();
+      if (response.ok) {
+        router.push({
+          pathname: '/CadastroEnderecoScreen',
+          params: { userId: result.userId },
+        });
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar usuário:', error);
+    }
+  };
 
-    loadFonts();
-  }, []);
+  const [fontsLoaded] = useFonts({
+    'JuliusSansOne': require('@/assets/fonts/JuliusSansOne-Regular.ttf'),
+    'Jura': require('@/assets/fonts/Jura-VariableFont_wght.ttf'),
+    'Inter-VariableFont_opsz,wght': require('@/assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
+    'Inter-Italic-VariableFont_opsz,wght': require('@/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf'),
+  });
 
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#0000ff" />;
