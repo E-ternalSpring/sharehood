@@ -16,6 +16,7 @@ const db = new sqlite3.Database(':memory:', (err) => {
     console.error('Erro ao conectar ao banco de dados', err);
   } else {
     console.log('Conectado ao banco de dados SQLite.');
+
     db.run(`CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       cpf TEXT, 
@@ -35,6 +36,16 @@ const db = new sqlite3.Database(':memory:', (err) => {
       numero TEXT, 
       complemento TEXT,
       nomeCondominio TEXT,
+      FOREIGN KEY (userId) REFERENCES users (id)
+    )`);
+
+    db.run(`CREATE TABLE recursos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      userId INTEGER, 
+      nome TEXT, 
+      descricao TEXT, 
+      imagem TEXT, 
+      disponivel BOOLEAN,
       FOREIGN KEY (userId) REFERENCES users (id)
     )`);
   }
@@ -79,6 +90,22 @@ app.post('/cadastro-endereco', (req, res) => {
       }
       res.status(201).json({ message: 'Endereço cadastrado com sucesso' });
   });
+});
+
+// Rota de cadastro de recurso
+app.post('/cadastro-recurso', (req, res) => {
+  const { userId, nome, descricao, imagem, disponivel } = req.body;
+
+  db.run(
+    `INSERT INTO recursos (userId, nome, descricao, imagem, disponivel) VALUES (?, ?, ?, ?, ?)`,
+    [userId, nome, descricao, imagem, disponivel],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: 'Recurso cadastrado com sucesso', recursoId: this.lastID });
+    }
+  );
 });
 
 app.listen(port, () => {

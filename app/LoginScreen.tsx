@@ -35,7 +35,7 @@ const LoginScreen = () => {
   }, []);
 
   if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator color="#0000ff" />;
   }
 
   const loginUser = async (cpf: string, password: string): Promise<boolean> => {

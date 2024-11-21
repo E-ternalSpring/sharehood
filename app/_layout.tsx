@@ -31,6 +31,13 @@ export default function RootLayout() {
           headerShown: false
         }} 
       />
+      <Stack.Screen
+        name="GestaoRecursosScreen"
+        options={{ 
+          title: 'GestaoRecursosScreen',
+          headerShown: false
+        }} 
+      />
     </Stack>
   );
 }
