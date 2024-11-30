@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const { obterRecursosPorUserId } = require('../services/recursosUserIdService');
 
 const app = express();
 const port = 3000;
@@ -11,21 +12,26 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Conectar ao banco de dados SQLite
-const db = new sqlite3.Database(':memory:', (err) => {
+const db = new sqlite3.Database('C:/Programacao/ProjetosJavaScript/ShareHood/backend/db/data.sqlite', (err) => {
   if (err) {
     console.error('Erro ao conectar ao banco de dados', err);
   } else {
     console.log('Conectado ao banco de dados SQLite.');
 
-    db.run(`CREATE TABLE users (
+    // Criação das tabelas após a conexão ser estabelecida
+    db.run(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       cpf TEXT, 
       password TEXT,
       nome TEXT,
       email TEXT
-    )`);
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela users', err);
+      }
+    });
 
-    db.run(`CREATE TABLE enderecos (
+    db.run(`CREATE TABLE IF NOT EXISTS enderecos (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       userId INTEGER,
       cep TEXT, 
@@ -37,9 +43,13 @@ const db = new sqlite3.Database(':memory:', (err) => {
       complemento TEXT,
       nomeCondominio TEXT,
       FOREIGN KEY (userId) REFERENCES users (id)
-    )`);
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela enderecos', err);
+      }
+    });
 
-    db.run(`CREATE TABLE recursos (
+    db.run(`CREATE TABLE IF NOT EXISTS recursos (
       id INTEGER PRIMARY KEY AUTOINCREMENT, 
       userId INTEGER, 
       nome TEXT, 
@@ -47,8 +57,17 @@ const db = new sqlite3.Database(':memory:', (err) => {
       imagem TEXT, 
       disponivel BOOLEAN,
       FOREIGN KEY (userId) REFERENCES users (id)
-    )`);
+    )`, (err) => {
+      if (err) {
+        console.error('Erro ao criar tabela recursos', err);
+      }
+    });
   }
+});
+
+// Rota de teste
+app.get('/', (req, res) => {
+  res.send('Servidor está funcionando!');
 });
 
 // Rota de autenticação
@@ -106,6 +125,19 @@ app.post('/cadastro-recurso', (req, res) => {
       res.status(201).json({ message: 'Recurso cadastrado com sucesso', recursoId: this.lastID });
     }
   );
+});
+
+// Rota de resgate de recurso
+app.get('/recursos/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    // Lógica para pegar os recursos de um banco de dados ou memória
+    const recursos = await obterRecursosPorUserId(userId);
+    res.json(recursos);  // Retorne os recursos para o cliente
+  } catch (error) {
+    console.error('Erro ao buscar recursos:', error);
+    res.status(500).json({ error: 'Erro ao buscar recursos' });
+  }
 });
 
 app.listen(port, () => {

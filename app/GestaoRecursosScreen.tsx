@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Switch } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +28,27 @@ const GestaoRecursosScreen = () => {
     avatarUrl: null,
   };
 
+  // Carregar recursos ao carregar a tela
+  useEffect(() => {
+    const fetchRecursos = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/recursos/${userId}`);
+        const data = await response.json();
+        
+        if (data && Array.isArray(data)) {
+          setRecursos(data); // Atualiza o estado com os recursos
+        } else {
+          console.log('Nenhum recurso encontrado para o usuário');
+        }
+      } catch (error) {
+        console.error("Erro ao carregar recursos:", error);
+      }
+    };
+  
+    if (userId) {  // Certifique-se de que o userId é válido
+      fetchRecursos();
+    }
+  }, [userId]); // Isso vai ser executado sempre que o userId mudar
   const handleAdicionarImagem = () => {
     console.log("Adicionar imagem");
   };
